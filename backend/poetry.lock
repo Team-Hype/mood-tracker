@@ -493,6 +493,7 @@ pyyaml = ">=5.1"
 virtualenv = ">=20.10.0"
 
 [[package]]
+<<<<<<< feat/db-init
 name = "psycopg2-binary"
 version = "2.9.11"
 description = "psycopg2 - Python-PostgreSQL Database Adapter"
@@ -570,6 +571,8 @@ files = [
 ]
 
 [[package]]
+=======
+>>>>>>> main
 name = "pydantic"
 version = "2.12.5"
 description = "Data validation using Python type hints"
@@ -1054,4 +1057,8 @@ python-discovery = ">=1"
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.14"
+<<<<<<< feat/db-init
 content-hash = "f473333c00692d19e91144768711fea4393f5139b83a20596fd60b4e6409df48"
+=======
+content-hash = "4966c381bba16c45ecd8b72bbbc80326ccb1186db1430dc253449aa8cace4378"
+>>>>>>> main
