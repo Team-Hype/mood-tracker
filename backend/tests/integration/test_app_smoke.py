@@ -10,5 +10,4 @@ async def test_swagger_is_available(app):
         resp = await client.get("/swagger")
 
     assert resp.status_code == 200
-    # Обычно /swagger отдаёт HTML
     assert "text/html" in resp.headers.get("content-type", "")
