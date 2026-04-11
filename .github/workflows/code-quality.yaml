@@ -1,0 +1,48 @@
+name: Code Quality
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: mood-tracker/backend
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install Poetry
+        run: pip install poetry
+
+      - name: Install dependencies
+        run: poetry install --with dev
+
+      - name: Install quality tools
+        run: pip install radon interrogate
+
+      - name: radon – cyclomatic complexity
+        shell: bash
+        run: |
+          set -e
+          radon cc -a -s app/src/
+          radon cc app/src/ -n C | grep -q '.' && echo "Complexity too high" && exit 1 || true
+
+      - name: radon – maintainability index
+        run: radon mi -s app/src/
+
+      - name: interrogate – docstring coverage
+        run: interrogate -vv app/src/ --fail-under 100

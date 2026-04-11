@@ -1,0 +1,44 @@
+name: Security Scan
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  security:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: mood-tracker/backend
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install Poetry
+        run: pip install poetry
+
+      - name: Install dependencies
+        run: poetry install --with dev
+
+      - name: Install security tools
+        run: pip install bandit pip-audit
+
+      - name: bandit – code security scan
+        run: bandit -r app/src/ -ll
+
+      - name: pip-audit – dependency vulnerabilities
+        run: pip-audit
