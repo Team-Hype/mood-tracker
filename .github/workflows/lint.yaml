@@ -14,7 +14,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: mood-tracker/backend
+        working-directory: backend
 
     steps:
       - name: Checkout repository
