@@ -41,4 +41,4 @@ jobs:
         run: ruff format --check app/src/
 
       - name: mypy – type check
-        run: poetry run mypy app/src/
+        run: mypy app/src/ --explicit-package-bases

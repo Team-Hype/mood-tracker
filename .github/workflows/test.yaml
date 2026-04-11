@@ -35,9 +35,6 @@ jobs:
       - name: Install dependencies
         run: poetry install --with dev --no-root
 
-      - name: Install pytest-cov
-        run: pip install pytest-cov
-
       - name: pytest – unit tests & coverage
         run: poetry run pytest tests/ --cov=app/src --cov-report=term-missing --cov-fail-under=80 -v
 
