@@ -1,3 +1,5 @@
+"""FastAPI application factory for the Mood Tracker backend."""
+
 __all__ = ["app"]
 
 import logging
@@ -8,7 +10,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from .common.logging import logging_settings, setup_logging
 from .docs import project_docs
 from .lifespan import lifespan
-from .routers import router
 from .settings import settings
 
 app = FastAPI(
