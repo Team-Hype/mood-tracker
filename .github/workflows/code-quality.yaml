@@ -45,4 +45,4 @@ jobs:
         run: radon mi -s app/src/
 
       - name: interrogate – docstring coverage
-        run: interrogate -vv app/src/ 
+        run: interrogate -vv app/src/ --fail-under 100

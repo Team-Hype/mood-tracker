@@ -1,9 +1,15 @@
+"""OpenAPI documentation configuration for the Mood Tracker application."""
+
 from pydantic import BaseModel
 
 
 class ProjectDocs(BaseModel):
+    """Container for OpenAPI specification metadata."""
+
     # Info for OpenAPI specification
     class OpenAPI:
+        """OpenAPI specification fields: title, version, contact, license, and tags."""
+
         VERSION = "0.1.0"
         WEBSITE_URL = "https://example.com"
         TITLE = "Mood Tracker"
@@ -11,6 +17,7 @@ class ProjectDocs(BaseModel):
 
         @property
         def CONTACT_INFO(self) -> dict:
+            """Return contact information dict for the OpenAPI spec."""
             return {
                 "name": "Contact Name",
                 "url": self.WEBSITE_URL,
@@ -30,6 +37,7 @@ class ProjectDocs(BaseModel):
 
         @property
         def specification(self) -> dict:
+            """Return the full OpenAPI specification dict for the inner OpenAPI class."""
             return {
                 "title": self.TITLE,
                 "description": self.DESCRIPTION,
@@ -41,6 +49,7 @@ class ProjectDocs(BaseModel):
 
     @property
     def specification(self) -> dict:
+        """Return the merged OpenAPI specification dict."""
         return {**self.OpenAPI().specification}
 
 

@@ -1,14 +1,15 @@
+"""FastAPI application factory for the Mood Tracker backend."""
+
 __all__ = ["app"]
 
 import logging
+
 from fastapi import FastAPI
 
 from .common.logging import logging_settings, setup_logging
-
-
 from .docs import project_docs
-from .settings import settings
 from .lifespan import lifespan
+from .settings import settings
 
 app = FastAPI(
     **project_docs.specification,
