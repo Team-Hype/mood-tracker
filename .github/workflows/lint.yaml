@@ -32,7 +32,7 @@ jobs:
         run: poetry install --with dev --no-root
 
       - name: Install lint tools
-        run: pip install ruff mypy
+        run: pip install ruff
 
       - name: Ruff – style check
         run: ruff check app/src/
@@ -41,4 +41,4 @@ jobs:
         run: ruff format --check app/src/
 
       - name: mypy – type check
-        run: mypy app/src/ --explicit-package-bases
+        run: poetry run mypy app/src/ --explicit-package-bases
