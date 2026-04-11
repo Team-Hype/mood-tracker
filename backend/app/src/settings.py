@@ -1,15 +1,14 @@
 __all__ = ["settings"]
 
 import ssl
+from pathlib import Path
 from typing import Optional
 
-from pydantic import ConfigDict
-from pydantic_settings import BaseSettings
-from pathlib import Path
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class DefaultSettings(BaseSettings):
-    model_config = ConfigDict(
+    model_config = SettingsConfigDict(
         env_file=Path(__file__).parent.parent.parent.parent / ".env", extra="ignore"
     )
 

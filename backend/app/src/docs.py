@@ -21,7 +21,7 @@ class ProjectDocs(BaseModel):
             "name": "MIT License",
         }
 
-        TAGS_INFO = [
+        TAGS_INFO: list[dict[str, str]] = [
             # {
             #     "name": "Example Tag",
             #     "description": "Example Tag Description",
