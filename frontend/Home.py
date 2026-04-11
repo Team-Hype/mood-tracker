@@ -1,7 +1,9 @@
 import streamlit as st
 
-from common import MOOD_EMOJIS, global_styles, submit_mood
-from analytics import MOOD_LABELS
+from frontend.common import global_styles, mood_card_markup, submit_mood
+from frontend.analytics import MOOD_LABELS
+
+MOOD_RANGE = [1, 2, 3, 4, 5]
 
 
 def main() -> None:
@@ -38,9 +40,7 @@ def main() -> None:
 
         if submitted:
             _handle_submit(
-                username=username,
-                comment=comment,
-                mood_entry=st.session_state["selected_mood"],
+                user=user, comment=comment, mood=int(st.session_state["selected_mood"])
             )
 
     st.caption(f"Selected mood: {st.session_state['selected_mood']}")
@@ -48,18 +48,17 @@ def main() -> None:
 
 def _render_mood_selector() -> None:
     st.subheader("How are you feeling?")
-    cols = st.columns(len(MOOD_LABELS), gap="medium")
-
-    for label, col in zip(MOOD_LABELS, cols, strict=True):
-        with col:
-            emoji = MOOD_EMOJIS.get(label, "❓")
-            button_label = f"{emoji}\n\n{label}"
-            if st.button(
-                button_label,
-                key=f"mood_btn_{label}",
-                use_container_width=True,
-            ):
-                st.session_state["selected_mood"] = label
+    columns = st.columns(5, gap="medium")
+    for mood, column in zip(MOOD_RANGE, columns, strict=True):
+        with column:
+            st.markdown(
+                mood_card_markup(
+                    mood=mood, is_active=st.session_state["selected_mood"] == mood
+                ),
+                unsafe_allow_html=True,
+            )
+            if st.button(f"Choose {mood}", key=f"mood-{mood}", width="stretch"):
+                st.session_state["selected_mood"] = mood
                 st.rerun()
 
 
@@ -84,7 +83,9 @@ def _handle_submit(username: str, comment: str, mood_entry: str) -> None:
         st.error(f"Could not submit the mood entry: {exc}")
         return
 
-    st.success("Mood submitted! Head to Analytics for the latest insights.")
+    st.success(
+        "Mood submitted successfully. Head to Analytics for the latest insights."
+    )
 
 
 if __name__ == "__main__":

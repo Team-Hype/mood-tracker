@@ -6,8 +6,8 @@ from typing import Any, cast
 
 import requests
 
-from analytics import MOOD_SCORE
-from models import MoodEntry
+from .analytics import LOW_MOOD_THRESHOLD, MOOD_LABELS
+from .models import MoodEntry
 
 API_URL_ENV = "MOOD_TRACKER_API_URL"
 DEFAULT_API_URL = "http://localhost:5000"
@@ -31,13 +31,15 @@ def get_api_url() -> str:
     return os.getenv(API_URL_ENV, DEFAULT_API_URL).rstrip("/")
 
 
-def fetch_moods() -> list[dict[str, Any]]:
+def fetch_moods() -> list[MoodPayload]:
+    """Load mood entries from the backend."""
     response = requests.get(f"{get_api_url()}/moods", timeout=10.0)
     response.raise_for_status()
     return cast(list[dict[str, Any]], response.json())
 
 
-def submit_mood(username: str, mood_entry: str, comment: str) -> None:
+def submit_mood(user: str, mood: int, comment: str) -> None:
+    """Submit a new mood entry to the backend."""
     response = requests.post(
         f"{get_api_url()}/moods",
         json={"username": username, "mood_entry": mood_entry, "comment": comment},

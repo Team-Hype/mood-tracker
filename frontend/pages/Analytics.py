@@ -6,14 +6,13 @@ import altair as alt
 import pandas as pd
 import streamlit as st
 
-from analytics import (
-    MOOD_LABELS,
+from frontend.analytics import (
     build_daily_averages,
     build_distribution,
     build_insights,
     build_user_summaries,
 )
-from common import (
+from frontend.common import (
     ACCENT_COLOR,
     BACKGROUND_COLOR,
     SURFACE_COLOR,
@@ -23,7 +22,7 @@ from common import (
     low_mood_class,
     to_domain_entries,
 )
-from models import DailyAverage, MoodDistribution, UserInsight, UserMoodSummary
+from frontend.models import DailyAverage, MoodDistribution, UserInsight, UserMoodSummary
 
 
 def main() -> None:
@@ -149,7 +148,7 @@ def _daily_chart(daily_averages: list[DailyAverage]) -> alt.Chart:
     )
     return cast(
         alt.Chart,
-        alt.Chart(df)
+        alt.Chart(daily_frame)
         .mark_line(
             point=alt.OverlayMarkDef(color=ACCENT_COLOR, filled=True),
             color=ACCENT_COLOR,
