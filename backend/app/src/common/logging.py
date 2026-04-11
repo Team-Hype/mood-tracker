@@ -1,14 +1,19 @@
+"""Logging configuration and setup for the Mood Tracker backend application."""
+
 __all__ = ["setup_logging", "logging_settings"]
 
-from datetime import datetime
-import os
 import logging
+import os
+from datetime import datetime
 
 from pydantic import BaseModel
+
 from app.src.settings import settings
 
 
 class LoggingSettings(BaseModel):
+    """Pydantic model holding all logging-related configuration values."""
+
     APP_NAME: str = settings.APP_NAME
     FILE_NAME: str = f"{APP_NAME}_{datetime.now().strftime('%Y-%m-%d_%H:%M:%S')}.log"
     LOG_DIR: str = "logs"
@@ -22,6 +27,7 @@ logging_settings: LoggingSettings = LoggingSettings()
 
 
 def setup_logging(logging_settings: LoggingSettings = logging_settings):
+    """Configure file and console logging handlers and return the application logger."""
     if not os.path.exists(logging_settings.LOG_DIR):
         os.makedirs(logging_settings.LOG_DIR)
 

@@ -1,15 +1,23 @@
+"""Application settings loaded from environment variables and .env file."""
+
 __all__ = ["settings"]
 
 import ssl
+from pathlib import Path
 from typing import Optional
 
-from pydantic import ConfigDict
-from pydantic_settings import BaseSettings
-from pathlib import Path
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class DefaultSettings(BaseSettings):
-    model_config = ConfigDict(
+    """Central configuration for the Mood Tracker backend.
+
+    Values are read from environment variables or the .env file located
+    at the repository root.  All fields can be overridden at runtime by
+    setting the corresponding environment variable.
+    """
+
+    model_config = SettingsConfigDict(
         env_file=Path(__file__).parent.parent.parent.parent / ".env", extra="ignore"
     )
 
@@ -35,10 +43,12 @@ class DefaultSettings(BaseSettings):
 
     @property
     def current_host_url(self) -> str:
+        """Return the full base URL of the current host including protocol."""
         return f"{self.PROTOCOL}://{self.CURRENT_HOST}"
 
     @property
     def database_settings(self) -> dict:
+        """Return a dict of database connection parameters."""
         return {
             "database": self.POSTGRES_DB,
             "user": self.POSTGRES_USER,
@@ -63,6 +73,7 @@ class DefaultSettings(BaseSettings):
 
     @property
     def db_context(self) -> dict:
+        """Return SQLAlchemy connect_args dict, including SSL context when enabled."""
         if not self.DB_USE_SSL:
             return {}
         ssl_context = ssl.create_default_context(cafile=self.DB_SSL_KEY_PATH)
