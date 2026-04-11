@@ -8,19 +8,13 @@ import altair as alt
 import pandas as pd
 import streamlit as st
 
-from team_mood_tracker.core.analytics import (
+from frontend.analytics import (
     build_daily_averages,
     build_distribution,
     build_insights,
     build_user_summaries,
 )
-from team_mood_tracker.core.models import (
-    DailyAverage,
-    MoodDistribution,
-    UserInsight,
-    UserMoodSummary,
-)
-from team_mood_tracker.frontend.common import (
+from frontend.common import (
     ACCENT_COLOR,
     BACKGROUND_COLOR,
     SURFACE_COLOR,
@@ -30,6 +24,7 @@ from team_mood_tracker.frontend.common import (
     low_mood_class,
     to_domain_entries,
 )
+from frontend.models import DailyAverage, MoodDistribution, UserInsight, UserMoodSummary
 
 
 def main() -> None:
@@ -154,10 +149,15 @@ def _build_daily_average_chart(daily_averages: list[DailyAverage]) -> alt.Chart:
     return cast(
         alt.Chart,
         alt.Chart(daily_frame)
-        .mark_line(point=alt.OverlayMarkDef(color=ACCENT_COLOR, filled=True), color=ACCENT_COLOR)
+        .mark_line(
+            point=alt.OverlayMarkDef(color=ACCENT_COLOR, filled=True),
+            color=ACCENT_COLOR,
+        )
         .encode(
             x=alt.X("Date:T", title="Date"),
-            y=alt.Y("Average mood:Q", title="Average mood", scale=alt.Scale(domain=[1, 5])),
+            y=alt.Y(
+                "Average mood:Q", title="Average mood", scale=alt.Scale(domain=[1, 5])
+            ),
             tooltip=["Date", "Average mood"],
         )
         .properties(title="Average Mood by Day", height=320)

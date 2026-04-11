@@ -6,10 +6,10 @@ import os
 from datetime import datetime
 from typing import Any, TypedDict, cast
 
-import httpx
+import requests
 
-from team_mood_tracker.core.analytics import LOW_MOOD_THRESHOLD, MOOD_LABELS
-from team_mood_tracker.core.models import MoodEntry
+from .analytics import LOW_MOOD_THRESHOLD, MOOD_LABELS
+from .models import MoodEntry
 
 API_URL_ENV = "MOOD_TRACKER_API_URL"
 DEFAULT_API_URL = "http://localhost:8000"
@@ -39,7 +39,7 @@ def get_api_url() -> str:
 
 def fetch_moods() -> list[MoodPayload]:
     """Load mood entries from the backend."""
-    response = httpx.get(f"{get_api_url()}/moods", timeout=10.0)
+    response = requests.get(f"{get_api_url()}/moods", timeout=10.0)
     response.raise_for_status()
     moods = cast(list[dict[str, Any]], response.json())
     for item in moods:
@@ -49,7 +49,7 @@ def fetch_moods() -> list[MoodPayload]:
 
 def submit_mood(user: str, mood: int, comment: str) -> None:
     """Submit a new mood entry to the backend."""
-    response = httpx.post(
+    response = requests.post(
         f"{get_api_url()}/moods",
         json={"user": user, "mood": mood, "comment": comment},
         timeout=10.0,

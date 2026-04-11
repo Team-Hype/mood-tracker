@@ -2,8 +2,8 @@
 
 import streamlit as st
 
-from team_mood_tracker.core.analytics import MOOD_LABELS
-from team_mood_tracker.frontend.common import global_styles, mood_card_markup, submit_mood
+from frontend.common import global_styles, mood_card_markup, submit_mood
+from frontend.analytics import MOOD_LABELS
 
 MOOD_RANGE = [1, 2, 3, 4, 5]
 
@@ -42,7 +42,9 @@ def main() -> None:
         submitted = st.form_submit_button("Submit", width="stretch")
 
         if submitted:
-            _handle_submit(user=user, comment=comment, mood=int(st.session_state["selected_mood"]))
+            _handle_submit(
+                user=user, comment=comment, mood=int(st.session_state["selected_mood"])
+            )
 
     st.caption(
         f"Selected mood: {st.session_state['selected_mood']} - "
@@ -57,7 +59,9 @@ def _render_mood_selector() -> None:
     for mood, column in zip(MOOD_RANGE, columns, strict=True):
         with column:
             st.markdown(
-                mood_card_markup(mood=mood, is_active=st.session_state["selected_mood"] == mood),
+                mood_card_markup(
+                    mood=mood, is_active=st.session_state["selected_mood"] == mood
+                ),
                 unsafe_allow_html=True,
             )
             if st.button(f"Choose {mood}", key=f"mood-{mood}", width="stretch"):
@@ -83,7 +87,9 @@ def _handle_submit(user: str, comment: str, mood: int) -> None:
         st.error(f"Could not submit the mood entry: {exc}")
         return
 
-    st.success("Mood submitted successfully. Head to Analytics for the latest insights.")
+    st.success(
+        "Mood submitted successfully. Head to Analytics for the latest insights."
+    )
 
 
 if __name__ == "__main__":
