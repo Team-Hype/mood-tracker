@@ -25,6 +25,18 @@ MOOD_EMOJIS: dict[str, str] = {
 
 VALID_MOOD_ENTRIES = list(MOOD_EMOJIS.keys())
 
+# Example responses for documentation
+EXAMPLE_MOOD_RESPONSE = {
+    "id": "123e4567-e89b-12d3-a456-426614174000",
+    "username": "anna",
+    "mood_entry": "Good",
+    "mood_emoji": "🙂",
+    "comment": "Had a productive day",
+    "created_at": "2026-04-12T10:30:00Z",
+}
+
+EXAMPLE_MOOD_LIST_RESPONSE = [EXAMPLE_MOOD_RESPONSE]
+
 
 class MoodCreateRequest(BaseModel):
     """Request body for creating a new mood entry."""
@@ -106,7 +118,23 @@ async def _delete_mood(session: AsyncSession, mood_id: UUID) -> bool:
     return True
 
 
-@router.get("", response_model=list[MoodResponse])
+@router.get(
+    "",
+    response_model=list[MoodResponse],
+    summary="Get Moods",
+    description="Retrieve all mood entries, with optional filtering by username and pagination.",
+    responses={
+        200: {
+            "description": "Successful Response",
+            "content": {
+                "application/json": {
+                    "example": EXAMPLE_MOOD_LIST_RESPONSE,
+                }
+            },
+        },
+        422: {"description": "Validation Error"},
+    },
+)
 async def get_moods(
     session: SessionDependency,
     username: str | None = Query(None),
@@ -117,7 +145,24 @@ async def get_moods(
     return await _list_moods(session, username=username, limit=limit, offset=offset)
 
 
-@router.get("/{mood_id}", response_model=MoodResponse)
+@router.get(
+    "/{mood_id}",
+    response_model=MoodResponse,
+    summary="Get Mood",
+    description="Fetch a single mood entry by its ID. Returns 404 if not found.",
+    responses={
+        200: {
+            "description": "Successful Response",
+            "content": {
+                "application/json": {
+                    "example": EXAMPLE_MOOD_RESPONSE,
+                }
+            },
+        },
+        404: {"description": "Mood entry not found"},
+        422: {"description": "Validation Error"},
+    },
+)
 async def get_mood(mood_id: UUID, session: SessionDependency):
     """Fetch a single mood entry by its ID. Returns 404 if not found."""
     entry = await _get_mood(session, mood_id)
@@ -126,7 +171,39 @@ async def get_mood(mood_id: UUID, session: SessionDependency):
     return entry
 
 
-@router.post("", response_model=MoodResponse, status_code=201)
+@router.post(
+    "",
+    response_model=MoodResponse,
+    status_code=201,
+    summary="Post Mood",
+    description="Create a new mood entry. Validates mood_entry against allowed values.",
+    responses={
+        201: {
+            "description": "Successful Response",
+            "content": {
+                "application/json": {
+                    "example": EXAMPLE_MOOD_RESPONSE,
+                }
+            },
+        },
+        422: {
+            "description": "Validation Error",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "detail": [
+                            {
+                                "loc": ["body", "mood_entry"],
+                                "msg": "value is not a valid mood entry",
+                                "type": "value_error",
+                            }
+                        ]
+                    }
+                }
+            },
+        },
+    },
+)
 async def post_mood(body: MoodCreateRequest, session: SessionDependency):
     """Create a new mood entry. Validates mood_entry against allowed values."""
     if body.mood_entry not in VALID_MOOD_ENTRIES:
@@ -142,7 +219,17 @@ async def post_mood(body: MoodCreateRequest, session: SessionDependency):
     )
 
 
-@router.delete("/{mood_id}", status_code=204)
+@router.delete(
+    "/{mood_id}",
+    status_code=204,
+    summary="Remove Mood",
+    description="Delete a mood entry by ID. Returns 204 on success, 404 if not found.",
+    responses={
+        204: {"description": "Successful Response (no content)"},
+        404: {"description": "Mood entry not found"},
+        422: {"description": "Validation Error"},
+    },
+)
 async def remove_mood(mood_id: UUID, session: SessionDependency):
     """Delete a mood entry by ID. Returns 204 on success, 404 if not found."""
     if not await _delete_mood(session, mood_id):
