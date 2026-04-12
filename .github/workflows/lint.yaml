@@ -40,5 +40,8 @@ jobs:
       - name: Ruff – format check
         run: ruff format --check app/src/
 
+      - name: Black – format check
+        run: poetry run black --check app/src/
+
       - name: mypy – type check
         run: poetry run mypy app/src/ --explicit-package-bases

@@ -35,6 +35,9 @@ jobs:
       - name: Install dependencies
         run: poetry install --with dev --no-root
 
+      - name: Set PYTHONPATH
+        run: echo "PYTHONPATH=$GITHUB_WORKSPACE" >> $GITHUB_ENV
+
       - name: pytest – unit tests & coverage
         run: poetry run pytest tests/ --cov=app/src --cov-report=term-missing --cov-fail-under=80 -v
 

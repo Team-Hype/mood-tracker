@@ -4,7 +4,6 @@ __all__ = ["settings"]
 
 import ssl
 from pathlib import Path
-from typing import Optional
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -36,10 +35,10 @@ class DefaultSettings(BaseSettings):
     DB_CONNECT_RETRY: int = 20
     DB_POOL_SIZE: int = 15
     DB_USE_SSL: bool = False
-    DB_SSL_KEY_PATH: Optional[str] = None
+    DB_SSL_KEY_PATH: str | None = None
 
-    SWAGGER_PATH: Optional[str] = "/swagger"
-    REDOC_PATH: Optional[str] = None
+    SWAGGER_PATH: str | None = "/swagger"
+    REDOC_PATH: str | None = None
 
     @property
     def current_host_url(self) -> str:
