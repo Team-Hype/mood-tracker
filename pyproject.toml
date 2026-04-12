@@ -23,7 +23,7 @@ dependencies = [
 ]
 
 [tool.pytest.ini_options]
-pythonpath = ["backend"]
+pythonpath = [".", "backend", "frontend"]
 asyncio_mode = "auto"
 
 [build-system]

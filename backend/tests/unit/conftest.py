@@ -2,15 +2,12 @@
 import os
 import sys
 from pathlib import Path
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock
 
 import pytest
-import pytest_asyncio
 
 # Добавляем backend в путь
-root_dir = Path(__file__).parent.parent.parent
-sys.path.insert(0, str(root_dir))
-sys.path.insert(0, str(root_dir / "backend"))
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 # Импортируем только если нужны для unit тестов
 try:
@@ -30,7 +27,7 @@ def setup_test_environment():
     os.environ.setdefault("DB_USE_SSL", "false")
     os.environ.setdefault("SWAGGER_PATH", "/swagger")
     os.environ.setdefault("APP_NAME", "mood-tracker-backend-test")
-    
+
     yield
 
 
@@ -50,11 +47,12 @@ def mock_db_session():
 def sample_mood_entry():
     """Create a sample mood entry for testing."""
     from datetime import datetime
+
     from app.db.models.track import MoodTrack
-    
+
     return MoodTrack(
         username="test_user",
         mood_entry=4,
         comment="Feeling great!",
-        created_at=datetime.now()
+        created_at=datetime.now(),
     )
