@@ -1,0 +1,362 @@
+{
+    "openapi": "3.1.0",
+    "info": {
+        "title": "Mood Tracker",
+        "description": "A  lightweight  internal  tool  designed  for  agile  teams  to monitor collective well-being",
+        "contact": {
+            "name": "Contact Name",
+            "url": "https://example.com/",
+            "email": "contact@gmail.com"
+        },
+        "license": {
+            "name": "MIT License"
+        },
+        "version": "0.1.0"
+    },
+    "paths": {
+        "/moods": {
+            "get": {
+                "tags": [
+                    "Moods"
+                ],
+                "summary": "Get Moods",
+                "description": "Retrieve all mood entries, with optional filtering by username and pagination.",
+                "operationId": "get_moods_moods_get",
+                "parameters": [
+                    {
+                        "name": "username",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "anyOf": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "type": "null"
+                                }
+                            ],
+                            "title": "Username"
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 1000,
+                            "minimum": 1,
+                            "default": 500,
+                            "title": "Limit"
+                        }
+                    },
+                    {
+                        "name": "offset",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "default": 0,
+                            "title": "Offset"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/MoodResponse"
+                                    },
+                                    "title": "Response Get Moods Moods Get"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Moods"
+                ],
+                "summary": "Post Mood",
+                "description": "Create a new mood entry. Validates mood_entry against allowed values.",
+                "operationId": "post_mood_moods_post",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/MoodCreateRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/MoodResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/moods/{mood_id}": {
+            "get": {
+                "tags": [
+                    "Moods"
+                ],
+                "summary": "Get Mood",
+                "description": "Fetch a single mood entry by its ID. Returns 404 if not found.",
+                "operationId": "get_mood_moods__mood_id__get",
+                "parameters": [
+                    {
+                        "name": "mood_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Mood Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/MoodResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Moods"
+                ],
+                "summary": "Remove Mood",
+                "description": "Delete a mood entry by ID. Returns 204 on success, 404 if not found.",
+                "operationId": "remove_mood_moods__mood_id__delete",
+                "parameters": [
+                    {
+                        "name": "mood_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "title": "Mood Id"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Successful Response"
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "HTTPValidationError": {
+                "properties": {
+                    "detail": {
+                        "items": {
+                            "$ref": "#/components/schemas/ValidationError"
+                        },
+                        "type": "array",
+                        "title": "Detail"
+                    }
+                },
+                "type": "object",
+                "title": "HTTPValidationError"
+            },
+            "MoodCreateRequest": {
+                "properties": {
+                    "username": {
+                        "type": "string",
+                        "maxLength": 50,
+                        "minLength": 1,
+                        "title": "Username",
+                        "examples": [
+                            "Anna"
+                        ]
+                    },
+                    "mood_entry": {
+                        "type": "string",
+                        "title": "Mood Entry",
+                        "description": "One of: Rough, Low, Okay, Good, Great",
+                        "examples": [
+                            "Good"
+                        ]
+                    },
+                    "comment": {
+                        "anyOf": [
+                            {
+                                "type": "string",
+                                "maxLength": 500
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Comment",
+                        "examples": [
+                            "Had a productive day"
+                        ]
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "username",
+                    "mood_entry"
+                ],
+                "title": "MoodCreateRequest",
+                "description": "Request body for creating a new mood entry."
+            },
+            "MoodResponse": {
+                "properties": {
+                    "id": {
+                        "type": "string",
+                        "format": "uuid",
+                        "title": "Id"
+                    },
+                    "username": {
+                        "type": "string",
+                        "title": "Username"
+                    },
+                    "mood_entry": {
+                        "type": "string",
+                        "title": "Mood Entry"
+                    },
+                    "mood_emoji": {
+                        "type": "string",
+                        "title": "Mood Emoji"
+                    },
+                    "comment": {
+                        "anyOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ],
+                        "title": "Comment"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "title": "Created At"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "id",
+                    "username",
+                    "mood_entry",
+                    "mood_emoji",
+                    "comment",
+                    "created_at"
+                ],
+                "title": "MoodResponse",
+                "description": "Response schema for a mood entry, including computed emoji and timestamp."
+            },
+            "ValidationError": {
+                "properties": {
+                    "loc": {
+                        "items": {
+                            "anyOf": [
+                                {
+                                    "type": "string"
+                                },
+                                {
+                                    "type": "integer"
+                                }
+                            ]
+                        },
+                        "type": "array",
+                        "title": "Location"
+                    },
+                    "msg": {
+                        "type": "string",
+                        "title": "Message"
+                    },
+                    "type": {
+                        "type": "string",
+                        "title": "Error Type"
+                    },
+                    "input": {
+                        "title": "Input"
+                    },
+                    "ctx": {
+                        "type": "object",
+                        "title": "Context"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "loc",
+                    "msg",
+                    "type"
+                ],
+                "title": "ValidationError"
+            }
+        }
+    }
+}
