@@ -1,0 +1,13 @@
+[run]
+source = backend/app,frontend
+omit = 
+    */frontend/Home.py
+    */backend/app/__main__.py
+    */tests/*
+    */test_*
+
+[report]
+fail_under = 80
+
+[html]
+directory = coverage_html_report

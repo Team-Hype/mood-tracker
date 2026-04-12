@@ -31,9 +31,7 @@ class SessionManager:
 
     def get_session_maker(self) -> async_sessionmaker:  # changed return type
         if not self.session_maker:
-            self.session_maker = async_sessionmaker(  # changed
-                self.engine, class_=AsyncSession, expire_on_commit=False
-            )
+            self.session_maker = async_sessionmaker(self.engine, class_=AsyncSession, expire_on_commit=False)  # changed
         return self.session_maker
 
     def default_engine(self):

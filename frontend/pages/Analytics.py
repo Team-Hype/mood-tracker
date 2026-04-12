@@ -80,9 +80,7 @@ def _render_user_cards(*, summaries: list[UserMoodSummary]) -> None:
         st.info("No user data to display.")
         return
     for s in summaries:
-        comment_html = (
-            f'<p class="caption">{s.last_comment}</p>' if s.last_comment else ""
-        )
+        comment_html = f'<p class="caption">{s.last_comment}</p>' if s.last_comment else ""
         st.markdown(
             f"""
             <div class="metric-card{low_mood_class(s.last_mood_entry)}">
@@ -156,9 +154,7 @@ def _daily_chart(daily_averages: list[DailyAverage]) -> alt.Chart:
         )
         .encode(
             x=alt.X("Date:T", title="Date"),
-            y=alt.Y(
-                "Average mood:Q", title="Average mood", scale=alt.Scale(domain=[1, 5])
-            ),
+            y=alt.Y("Average mood:Q", title="Average mood", scale=alt.Scale(domain=[1, 5])),
             tooltip=["Date", "Average mood"],
         )
         .properties(title="Average Mood by Day", height=320)

@@ -37,11 +37,7 @@ def build_daily_averages(entries: list[MoodEntry]) -> list[DailyAverage]:
     """Average mood per calendar day."""
     by_day: dict[date, list[int]] = defaultdict(list)
     for item in entries:
-        day = (
-            item.date.date()
-            if isinstance(item.date, datetime)
-            else date.fromisoformat(str(item.date))
-        )
+        day = item.date.date() if isinstance(item.date, datetime) else date.fromisoformat(str(item.date))
         by_day[day].append(item.mood)
     return [
         DailyAverage(day=d, average_mood=sum(moods) / len(moods))
@@ -61,11 +57,7 @@ def build_user_summaries(entries: list[MoodEntry]) -> list[UserMoodSummary]:
         last = ordered[-1]
         avg = sum(e.mood for e in ordered) / len(ordered)
         last_dt = last.date
-        last_date = (
-            last_dt.strftime("%Y-%m-%d %H:%M")
-            if isinstance(last_dt, datetime)
-            else str(last_dt)
-        )
+        last_date = last_dt.strftime("%Y-%m-%d %H:%M") if isinstance(last_dt, datetime) else str(last_dt)
         summaries.append(
             UserMoodSummary(
                 user=user,
@@ -94,8 +86,7 @@ def build_insights(entries: list[MoodEntry]) -> list[UserInsight]:
                 UserInsight(
                     user=summary.user,
                     headline=(
-                        f"Latest mood is {summary.last_mood}/5. "
-                        "A short check-in or pairing might help this week."
+                        f"Latest mood is {summary.last_mood}/5. " "A short check-in or pairing might help this week."
                     ),
                     severity=severity,
                 )

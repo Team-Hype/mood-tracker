@@ -17,9 +17,7 @@ class DefaultSettings(BaseSettings):
     setting the corresponding environment variable.
     """
 
-    model_config = SettingsConfigDict(
-        env_file=Path(__file__).parent.parent.parent.parent / ".env", extra="ignore"
-    )
+    model_config = SettingsConfigDict(env_file=Path(__file__).parent.parent.parent.parent / ".env", extra="ignore")
 
     APP_NAME: str = "mood-tracker-backend"
     PATH_PREFIX: str = "/api/v1"
@@ -60,16 +58,12 @@ class DefaultSettings(BaseSettings):
     @property
     def database_uri(self) -> str:
         """Async database uri"""
-        return "postgresql+asyncpg://{user}:{password}@{host}:{port}/{database}".format(
-            **self.database_settings
-        )
+        return "postgresql+asyncpg://{user}:{password}@{host}:{port}/{database}".format(**self.database_settings)
 
     @property
     def database_uri_sync(self) -> str:
         """Sync database uri"""
-        return "postgresql://{user}:{password}@{host}:{port}/{database}".format(
-            **self.database_settings
-        )
+        return "postgresql://{user}:{password}@{host}:{port}/{database}".format(**self.database_settings)
 
     @property
     def db_context(self) -> dict:

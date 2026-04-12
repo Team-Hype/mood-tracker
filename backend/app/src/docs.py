@@ -13,7 +13,9 @@ class ProjectDocs(BaseModel):
         VERSION = "0.1.0"
         WEBSITE_URL = "https://example.com"
         TITLE = "Mood Tracker"
-        DESCRIPTION = """A  lightweight  internal  tool  designed  for  agile  teams  to monitor collective well-being"""
+        DESCRIPTION = (
+            """A  lightweight  internal  tool  designed  for  agile  teams  to monitor collective well-being"""
+        )
 
         @property
         def CONTACT_INFO(self) -> dict:

@@ -53,9 +53,7 @@ def _render_mood_selector() -> None:
     for mood, column in zip(MOOD_RANGE, columns, strict=True):
         with column:
             st.markdown(
-                mood_card_markup(
-                    mood=mood, is_active=st.session_state["selected_mood"] == mood
-                ),
+                mood_card_markup(mood=mood, is_active=st.session_state["selected_mood"] == mood),
                 unsafe_allow_html=True,
             )
             if st.button(f"Choose {mood}", key=f"mood-{mood}", width="stretch"):
@@ -84,9 +82,7 @@ def _handle_submit(username: str, comment: str, mood_entry: str) -> None:
         st.error(f"Could not submit the mood entry: {exc}")
         return
 
-    st.success(
-        "Mood submitted successfully. Head to Analytics for the latest insights."
-    )
+    st.success("Mood submitted successfully. Head to Analytics for the latest insights.")
 
 
 if __name__ == "__main__":

@@ -10,18 +10,10 @@ from .. import DeclarativeBase as Base
 class MoodTrack(UUIDMixin, Base):
     __tablename__ = "mood_track"
 
-    username: Mapped[str] = mapped_column(
-        nullable=False, comment="Username of the entry author"
-    )
-    mood_entry: Mapped[str] = mapped_column(
-        nullable=False, comment="Mood entry description"
-    )
-    mood_emoji: Mapped[str] = mapped_column(
-        nullable=False, comment="Mood emoji representation"
-    )
-    comment: Mapped[str | None] = mapped_column(
-        Text, nullable=True, comment="Optional user comment"
-    )
+    username: Mapped[str] = mapped_column(nullable=False, comment="Username of the entry author")
+    mood_entry: Mapped[str] = mapped_column(nullable=False, comment="Mood entry description")
+    mood_emoji: Mapped[str] = mapped_column(nullable=False, comment="Mood emoji representation")
+    comment: Mapped[str | None] = mapped_column(Text, nullable=True, comment="Optional user comment")
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         server_default=func.now(),
