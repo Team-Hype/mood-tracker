@@ -1,3 +1,5 @@
+"""Database model for mood tracking entries."""
+
 from datetime import datetime
 
 from sqlalchemy import Text, DateTime, func
@@ -8,6 +10,8 @@ from .. import DeclarativeBase as Base
 
 
 class MoodTrack(UUIDMixin, Base):
+    """Represents a user's mood tracking record."""
+
     __tablename__ = "mood_track"
 
     username: Mapped[str] = mapped_column(

@@ -1,3 +1,5 @@
+"""Application entry point."""
+
 import os
 import uvicorn
 from pathlib import Path

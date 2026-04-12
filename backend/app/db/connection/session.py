@@ -1,3 +1,5 @@
+"""Database session management utilities."""
+
 __all__ = ["get_session", "SessionDependency"]
 
 from threading import Lock
@@ -14,29 +16,35 @@ from app.src.settings import settings
 
 
 class SessionManager:
+    """Singleton responsible for managing database engine and session factory."""
+
     _instance = None
     _lock = Lock()
-    session_maker: async_sessionmaker | None = None  # changed
+    session_maker: async_sessionmaker | None = None
     engine: AsyncEngine
 
     def __init__(self) -> None:
+        """Initialize the session manager and create the engine."""
         self.refresh()
 
     def __new__(cls):
+        """Ensure a single instance of SessionManager (thread-safe singleton)."""
         with cls._lock:
             if not cls._instance:
                 cls._instance = super(SessionManager, cls).__new__(cls)
                 cls._instance.refresh()
             return cls._instance
 
-    def get_session_maker(self) -> async_sessionmaker:  # changed return type
+    def get_session_maker(self) -> async_sessionmaker:
+        """Return a configured async session factory."""
         if not self.session_maker:
-            self.session_maker = async_sessionmaker(  # changed
+            self.session_maker = async_sessionmaker(
                 self.engine, class_=AsyncSession, expire_on_commit=False
             )
         return self.session_maker
 
-    def default_engine(self):
+    def default_engine(self) -> None:
+        """Create and configure the default async database engine."""
         self.engine = create_async_engine(
             settings.database_uri,
             echo=True,
@@ -45,10 +53,12 @@ class SessionManager:
         )
 
     def refresh(self) -> None:
+        """Reinitialize the database engine."""
         self.default_engine()
 
 
 async def get_session():
+    """Provide a database session for dependency injection."""
     session_maker = SessionManager().get_session_maker()
     async with session_maker() as session:
         yield session
