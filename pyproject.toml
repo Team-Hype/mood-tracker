@@ -31,7 +31,6 @@ build-backend = "poetry.core.masonry.api"
 [dependency-groups]
 dev = [
     "pre-commit (>=4.5.1,<5.0.0)",
-
     "mypy (>=1.0.0,<2.0.0)",
     "pytest (>=8.0.0,<9.0.0)",
     "pytest-asyncio (>=0.23.0,<1.0.0)",
@@ -41,7 +40,4 @@ dev = [
 ]
 
 [tool.poetry]
-packages = [
-    { include = "app", from = "backend" },
-    { include = "frontend", from = "." }
-]
+package-mode = false

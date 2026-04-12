@@ -1,0 +1,48 @@
+# Version control
+.git
+.gitignore
+
+# CI / tooling
+.github
+.pre-commit-config.yaml
+.editorconfig
+
+# Python artifacts
+__pycache__
+*.pyc
+*.pyo
+*.egg-info
+.mypy_cache
+.pytest_cache
+.ruff_cache
+.coverage
+htmlcov
+dist
+build
+
+# Virtual environments
+.venv
+venv
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# Logs
+logs/
+
+# Docs
+docs/
+
+# Local env
+.env
+
+# Docker compose
+docker-compose.yaml
+docker-compose.yml
+
+# License / readme
+LICENSE
+README.md
