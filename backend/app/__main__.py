@@ -1,8 +1,9 @@
 """Application entry point."""
 
 import os
-import uvicorn
 from pathlib import Path
+
+import uvicorn
 
 from app.src.settings import settings
 

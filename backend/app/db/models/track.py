@@ -2,10 +2,11 @@
 
 from datetime import datetime
 
-from sqlalchemy import Text, DateTime, func
+from sqlalchemy import DateTime, Text, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.models.mixins.index import UUIDMixin
+
 from .. import DeclarativeBase as Base
 
 

@@ -7,11 +7,12 @@ from typing import Annotated
 
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import (
-    AsyncSession,
-    create_async_engine,
     AsyncEngine,
+    AsyncSession,
     async_sessionmaker,
+    create_async_engine,
 )
+
 from app.src.settings import settings
 
 
@@ -31,7 +32,7 @@ class SessionManager:
         """Ensure a single instance of SessionManager (thread-safe singleton)."""
         with cls._lock:
             if not cls._instance:
-                cls._instance = super(SessionManager, cls).__new__(cls)
+                cls._instance = super().__new__(cls)
                 cls._instance.refresh()
             return cls._instance
 
