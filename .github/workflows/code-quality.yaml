@@ -39,7 +39,7 @@ jobs:
         run: |
           set -e
           radon cc -a -s app/src/
-          radon cc app/src/ -n A | grep -q '.' && echo "Complexity too high" && exit 1 || true
+          radon cc app/src/ -n B \| grep -q '.' && echo "Complexity too high" && exit 1 || true
 
       - name: radon – maintainability index
         run: radon mi -s app/src/

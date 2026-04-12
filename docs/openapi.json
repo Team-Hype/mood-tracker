@@ -74,19 +74,22 @@
                                         "$ref": "#/components/schemas/MoodResponse"
                                     },
                                     "title": "Response Get Moods Moods Get"
-                                }
+                                },
+                                "example": [
+                                    {
+                                        "id": "123e4567-e89b-12d3-a456-426614174000",
+                                        "username": "anna",
+                                        "mood_entry": "Good",
+                                        "mood_emoji": "🙂",
+                                        "comment": "Had a productive day",
+                                        "created_at": "2026-04-12T10:30:00Z"
+                                    }
+                                ]
                             }
                         }
                     },
                     "422": {
-                        "description": "Validation Error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/HTTPValidationError"
-                                }
-                            }
-                        }
+                        "description": "Validation Error"
                     }
                 }
             },
@@ -114,6 +117,14 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/MoodResponse"
+                                },
+                                "example": {
+                                    "id": "123e4567-e89b-12d3-a456-426614174000",
+                                    "username": "anna",
+                                    "mood_entry": "Good",
+                                    "mood_emoji": "🙂",
+                                    "comment": "Had a productive day",
+                                    "created_at": "2026-04-12T10:30:00Z"
                                 }
                             }
                         }
@@ -122,8 +133,17 @@
                         "description": "Validation Error",
                         "content": {
                             "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                "example": {
+                                    "detail": [
+                                        {
+                                            "loc": [
+                                                "body",
+                                                "mood_entry"
+                                            ],
+                                            "msg": "value is not a valid mood entry",
+                                            "type": "value_error"
+                                        }
+                                    ]
                                 }
                             }
                         }
@@ -158,19 +178,23 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/MoodResponse"
+                                },
+                                "example": {
+                                    "id": "123e4567-e89b-12d3-a456-426614174000",
+                                    "username": "anna",
+                                    "mood_entry": "Good",
+                                    "mood_emoji": "🙂",
+                                    "comment": "Had a productive day",
+                                    "created_at": "2026-04-12T10:30:00Z"
                                 }
                             }
                         }
                     },
+                    "404": {
+                        "description": "Mood entry not found"
+                    },
                     "422": {
-                        "description": "Validation Error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/HTTPValidationError"
-                                }
-                            }
-                        }
+                        "description": "Validation Error"
                     }
                 }
             },
@@ -195,17 +219,13 @@
                 ],
                 "responses": {
                     "204": {
-                        "description": "Successful Response"
+                        "description": "Successful Response (no content)"
+                    },
+                    "404": {
+                        "description": "Mood entry not found"
                     },
                     "422": {
-                        "description": "Validation Error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/HTTPValidationError"
-                                }
-                            }
-                        }
+                        "description": "Validation Error"
                     }
                 }
             }
@@ -213,19 +233,6 @@
     },
     "components": {
         "schemas": {
-            "HTTPValidationError": {
-                "properties": {
-                    "detail": {
-                        "items": {
-                            "$ref": "#/components/schemas/ValidationError"
-                        },
-                        "type": "array",
-                        "title": "Detail"
-                    }
-                },
-                "type": "object",
-                "title": "HTTPValidationError"
-            },
             "MoodCreateRequest": {
                 "properties": {
                     "username": {
@@ -316,46 +323,6 @@
                 ],
                 "title": "MoodResponse",
                 "description": "Response schema for a mood entry, including computed emoji and timestamp."
-            },
-            "ValidationError": {
-                "properties": {
-                    "loc": {
-                        "items": {
-                            "anyOf": [
-                                {
-                                    "type": "string"
-                                },
-                                {
-                                    "type": "integer"
-                                }
-                            ]
-                        },
-                        "type": "array",
-                        "title": "Location"
-                    },
-                    "msg": {
-                        "type": "string",
-                        "title": "Message"
-                    },
-                    "type": {
-                        "type": "string",
-                        "title": "Error Type"
-                    },
-                    "input": {
-                        "title": "Input"
-                    },
-                    "ctx": {
-                        "type": "object",
-                        "title": "Context"
-                    }
-                },
-                "type": "object",
-                "required": [
-                    "loc",
-                    "msg",
-                    "type"
-                ],
-                "title": "ValidationError"
             }
         }
     }
