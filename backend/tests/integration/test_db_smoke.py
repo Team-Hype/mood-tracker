@@ -1,12 +1,14 @@
 import pytest
 from sqlalchemy import text
+from sqlalchemy.ext.asyncio import create_async_engine
 
 
 @pytest.mark.asyncio
 async def test_db_connection_smoke(set_test_env):
-    from app.db.connection.session import SessionManager
+    from app.src.settings import settings
 
-    session_maker = SessionManager().get_session_maker()
-    async with session_maker() as session:
-        value = await session.scalar(text("SELECT 1"))
-        assert value == 1
+    engine = create_async_engine(settings.database_uri)
+    async with engine.connect() as conn:
+        result = await conn.execute(text("SELECT 1"))
+        assert result.scalar() == 1
+    await engine.dispose()

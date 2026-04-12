@@ -1,5 +1,3 @@
-"""Domain types for the Streamlit mood UI."""
-
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -8,47 +6,39 @@ from datetime import date, datetime
 
 @dataclass(frozen=True, slots=True)
 class MoodEntry:
-    """Single mood check-in from the API or store."""
-
-    id: int
-    user: str
-    mood: int
-    comment: str
-    date: datetime
+    id: str
+    username: str
+    mood_entry: str
+    mood_emoji: str
+    comment: str | None
+    created_at: datetime
 
 
 @dataclass(frozen=True, slots=True)
 class MoodDistribution:
-    """Count of entries for one mood score."""
-
-    mood: int
+    mood_entry: str
     count: int
 
 
 @dataclass(frozen=True, slots=True)
 class DailyAverage:
-    """Average mood for a calendar day."""
-
     day: date
     average_mood: float
 
 
 @dataclass(frozen=True, slots=True)
 class UserMoodSummary:
-    """Aggregated stats for one user."""
-
-    user: str
+    username: str
     average_mood: float
-    last_mood: int
+    last_mood_entry: str
+    last_mood_emoji: str
     entries_count: int
     last_date: str
-    last_comment: str
+    last_comment: str | None
 
 
 @dataclass(frozen=True, slots=True)
 class UserInsight:
-    """Rule-based insight for display on the analytics page."""
-
-    user: str
+    username: str
     headline: str
     severity: str

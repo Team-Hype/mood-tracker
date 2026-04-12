@@ -1,8 +1,7 @@
 __all__ = ["DeclarativeBase"]
 
-from sqlalchemy import MetaData
 from sqlalchemy.ext.asyncio import AsyncAttrs
-from sqlalchemy.orm import declarative_base
+from sqlalchemy.orm import DeclarativeBase as Base
 
 convention = {
     "all_column_names": lambda constraint, table: "_".join(
@@ -14,9 +13,6 @@ convention = {
     "fk": "fk__%(table_name)s__%(all_column_names)s__%(referred_table_name)s",
     "pk": "pk__%(table_name)s",
 }
-
-metadata = MetaData(naming_convention=convention)
-Base = declarative_base(metadata=metadata)
 
 
 class DeclarativeBase(AsyncAttrs, Base):

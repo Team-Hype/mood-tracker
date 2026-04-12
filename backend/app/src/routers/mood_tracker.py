@@ -1,3 +1,5 @@
+"""Mood tracking endpoints – create, retrieve, list, and delete mood entries."""
+
 from __future__ import annotations
 
 from datetime import datetime
@@ -25,6 +27,8 @@ VALID_MOOD_ENTRIES = list(MOOD_EMOJIS.keys())
 
 
 class MoodCreateRequest(BaseModel):
+    """Request body for creating a new mood entry."""
+
     username: str = Field(..., min_length=1, max_length=50, examples=["Anna"])
     mood_entry: str = Field(
         ...,
@@ -39,6 +43,8 @@ class MoodCreateRequest(BaseModel):
 
 
 class MoodResponse(BaseModel):
+    """Response schema for a mood entry, including computed emoji and timestamp."""
+
     id: UUID
     username: str
     mood_entry: str
@@ -56,6 +62,7 @@ async def _create_mood(
     mood_entry: str,
     comment: str | None,
 ) -> MoodTrack:
+    """Create a new mood entry in the database and return the ORM object."""
     entry = MoodTrack(
         username=username,
         mood_entry=mood_entry,
@@ -75,6 +82,7 @@ async def _list_moods(
     limit: int = 500,
     offset: int = 0,
 ) -> list[MoodTrack]:
+    """Return a list of mood entries, optionally filtered by username."""
     query = select(MoodTrack)
     if username:
         query = query.where(MoodTrack.username == username)
@@ -84,10 +92,12 @@ async def _list_moods(
 
 
 async def _get_mood(session: AsyncSession, mood_id: UUID) -> MoodTrack | None:
+    """Retrieve a single mood entry by its UUID, or None if not found."""
     return await session.get(MoodTrack, mood_id)
 
 
 async def _delete_mood(session: AsyncSession, mood_id: UUID) -> bool:
+    """Delete a mood entry by UUID. Returns True if deleted, False if not found."""
     entry = await _get_mood(session, mood_id)
     if entry is None:
         return False
@@ -103,11 +113,13 @@ async def get_moods(
     limit: int = Query(500, ge=1, le=1000),
     offset: int = Query(0, ge=0),
 ):
+    """Retrieve all mood entries, with optional filtering by username and pagination."""
     return await _list_moods(session, username=username, limit=limit, offset=offset)
 
 
 @router.get("/{mood_id}", response_model=MoodResponse)
 async def get_mood(mood_id: UUID, session: SessionDependency):
+    """Fetch a single mood entry by its ID. Returns 404 if not found."""
     entry = await _get_mood(session, mood_id)
     if entry is None:
         raise HTTPException(status_code=404, detail="Mood entry not found")
@@ -116,6 +128,7 @@ async def get_mood(mood_id: UUID, session: SessionDependency):
 
 @router.post("", response_model=MoodResponse, status_code=201)
 async def post_mood(body: MoodCreateRequest, session: SessionDependency):
+    """Create a new mood entry. Validates mood_entry against allowed values."""
     if body.mood_entry not in VALID_MOOD_ENTRIES:
         raise HTTPException(
             status_code=422,
@@ -131,5 +144,6 @@ async def post_mood(body: MoodCreateRequest, session: SessionDependency):
 
 @router.delete("/{mood_id}", status_code=204)
 async def remove_mood(mood_id: UUID, session: SessionDependency):
+    """Delete a mood entry by ID. Returns 204 on success, 404 if not found."""
     if not await _delete_mood(session, mood_id):
         raise HTTPException(status_code=404, detail="Mood entry not found")

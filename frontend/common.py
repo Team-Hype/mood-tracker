@@ -6,8 +6,8 @@ from typing import Any, cast
 
 import requests
 
-from .analytics import LOW_MOOD_THRESHOLD, MOOD_LABELS
-from .models import MoodEntry
+from analytics import MOOD_SCORE
+from models import MoodEntry
 
 API_URL_ENV = "MOOD_TRACKER_API_URL"
 DEFAULT_API_URL = "http://localhost:5000"
@@ -31,15 +31,13 @@ def get_api_url() -> str:
     return os.getenv(API_URL_ENV, DEFAULT_API_URL).rstrip("/")
 
 
-def fetch_moods() -> list[MoodPayload]:
-    """Load mood entries from the backend."""
+def fetch_moods() -> list[dict[str, Any]]:
     response = requests.get(f"{get_api_url()}/moods", timeout=10.0)
     response.raise_for_status()
     return cast(list[dict[str, Any]], response.json())
 
 
-def submit_mood(user: str, mood: int, comment: str) -> None:
-    """Submit a new mood entry to the backend."""
+def submit_mood(username: str, mood_entry: str, comment: str) -> None:
     response = requests.post(
         f"{get_api_url()}/moods",
         json={"username": username, "mood_entry": mood_entry, "comment": comment},
@@ -88,7 +86,6 @@ def mood_card_markup(mood_label: str, is_active: bool) -> str:
 
 
 def global_styles() -> str:
-    """Return shared CSS for the application."""
     return f"""
     <style>
     .stApp {{
@@ -134,39 +131,26 @@ def global_styles() -> str:
         font-size: 2rem;
         margin-bottom: 0.35rem;
     }}
-    .mood-number {{
-        font-size: 0.8rem;
-        color: {MUTED_TEXT};
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-    }}
     .mood-label {{
         font-size: 0.95rem;
         font-weight: 600;
     }}
     .stButton > button {{
         width: 100%;
-        min-height: 120px;
         border-radius: 16px;
-        background: {SURFACE_COLOR};
-        border: 1px solid rgba(240, 140, 178, 0.14);
+        border: 1px solid rgba(240, 140, 178, 0.25);
+        background: transparent;
         color: {TEXT_COLOR};
+        min-height: 130px;
+        white-space: pre-line;
         font-size: 1rem;
-        font-weight: 600;
-        transition: all 0.2s ease;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 0.25rem;
+        line-height: 1.5;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
     }}
     .stButton > button:hover {{
         border-color: {ACCENT_COLOR};
         box-shadow: 0 0 24px rgba(240, 140, 178, 0.22);
         transform: translateY(-4px);
-    }}
-    .stAltairChart {{
-        margin-top: 0.5rem;
     }}
     .stTextInput input, .stTextArea textarea {{
         border-radius: 14px;

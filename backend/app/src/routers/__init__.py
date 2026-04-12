@@ -1,3 +1,5 @@
+"""Router aggregation for the Mood Tracker API."""
+
 __all__ = ["router"]
 
 from fastapi import APIRouter
