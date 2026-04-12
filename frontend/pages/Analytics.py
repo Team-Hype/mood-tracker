@@ -1,5 +1,3 @@
-"""Streamlit analytics page for mood insights."""
-
 from __future__ import annotations
 
 from typing import cast
@@ -8,19 +6,14 @@ import altair as alt
 import pandas as pd
 import streamlit as st
 
-from team_mood_tracker.core.analytics import (
+from analytics import (
+    MOOD_LABELS,
     build_daily_averages,
     build_distribution,
     build_insights,
     build_user_summaries,
 )
-from team_mood_tracker.core.models import (
-    DailyAverage,
-    MoodDistribution,
-    UserInsight,
-    UserMoodSummary,
-)
-from team_mood_tracker.frontend.common import (
+from common import (
     ACCENT_COLOR,
     BACKGROUND_COLOR,
     SURFACE_COLOR,
@@ -30,10 +23,10 @@ from team_mood_tracker.frontend.common import (
     low_mood_class,
     to_domain_entries,
 )
+from models import DailyAverage, MoodDistribution, UserInsight, UserMoodSummary
 
 
 def main() -> None:
-    """Render the analytics and insights dashboard."""
     st.set_page_config(page_title="Analytics", page_icon="💗", layout="wide")
     st.markdown(global_styles(), unsafe_allow_html=True)
     st.markdown(
@@ -74,28 +67,31 @@ def _render_charts(
     distribution: list[MoodDistribution],
     daily_averages: list[DailyAverage],
 ) -> None:
-    """Render the main analytics charts."""
-    left_column, right_column = st.columns(2, gap="large")
-
-    with left_column:
-        st.altair_chart(_build_distribution_chart(distribution), width="stretch")
-    with right_column:
-        st.altair_chart(_build_daily_average_chart(daily_averages), width="stretch")
+    left, right = st.columns(2, gap="large")
+    with left:
+        st.altair_chart(_distribution_chart(distribution), use_container_width=True)
+    with right:
+        st.altair_chart(_daily_chart(daily_averages), use_container_width=True)
 
 
 def _render_user_cards(*, summaries: list[UserMoodSummary]) -> None:
-    """Render per-user statistic cards."""
     st.subheader("Users")
-    for summary in summaries:
+    if not summaries:
+        st.info("No user data to display.")
+        return
+    for s in summaries:
+        comment_html = (
+            f'<p class="caption">{s.last_comment}</p>' if s.last_comment else ""
+        )
         st.markdown(
             f"""
-            <div class="metric-card{low_mood_class(summary.last_mood)}">
-                <h3>{summary.user}</h3>
-                <p><strong>Average mood:</strong> {format_score(summary.average_mood)}</p>
-                <p><strong>Latest mood:</strong> {summary.last_mood}/5</p>
-                <p><strong>Entries:</strong> {summary.entries_count}</p>
-                <p><strong>Last update:</strong> {summary.last_date}</p>
-                <p class="caption">{summary.last_comment}</p>
+            <div class="metric-card{low_mood_class(s.last_mood_entry)}">
+                <h3>{s.username}</h3>
+                <p><strong>Average mood:</strong> {format_score(s.average_mood)}</p>
+                <p><strong>Latest:</strong> {s.last_mood_emoji} {s.last_mood_entry}</p>
+                <p><strong>Entries:</strong> {s.entries_count}</p>
+                <p><strong>Last update:</strong> {s.last_date}</p>
+                {comment_html}
             </div>
             """,
             unsafe_allow_html=True,
@@ -103,13 +99,15 @@ def _render_user_cards(*, summaries: list[UserMoodSummary]) -> None:
 
 
 def _render_insights(*, insights: list[UserInsight]) -> None:
-    """Render rule-based textual insight cards."""
     st.subheader("Insights")
+    if not insights:
+        st.success("All good — no concerns detected across the team.")
+        return
     for insight in insights:
         st.markdown(
             f"""
             <div class="insight-card">
-                <p><strong>{insight.user}</strong></p>
+                <p><strong>{insight.username}</strong></p>
                 <p>{insight.headline}</p>
                 <p class="caption">Severity: {insight.severity}</p>
             </div>
@@ -118,20 +116,19 @@ def _render_insights(*, insights: list[UserInsight]) -> None:
         )
 
 
-def _build_distribution_chart(distribution: list[MoodDistribution]) -> alt.Chart:
-    """Build the styled mood distribution bar chart."""
-    distribution_frame = pd.DataFrame(
+def _distribution_chart(distribution: list[MoodDistribution]) -> alt.Chart:
+    df = pd.DataFrame(
         {
-            "Mood": [item.mood for item in distribution],
-            "Entries": [item.count for item in distribution],
+            "Mood": [d.mood_entry for d in distribution],
+            "Entries": [d.count for d in distribution],
         }
     )
     return cast(
         alt.Chart,
-        alt.Chart(distribution_frame)
+        alt.Chart(df)
         .mark_bar(cornerRadiusTopLeft=8, cornerRadiusTopRight=8, color=ACCENT_COLOR)
         .encode(
-            x=alt.X("Mood:O", title="Mood"),
+            x=alt.X("Mood:N", title="Mood", sort=MOOD_LABELS),
             y=alt.Y("Entries:Q", title="Entries"),
             tooltip=["Mood", "Entries"],
         )
@@ -143,21 +140,25 @@ def _build_distribution_chart(distribution: list[MoodDistribution]) -> alt.Chart
     )
 
 
-def _build_daily_average_chart(daily_averages: list[DailyAverage]) -> alt.Chart:
-    """Build the styled daily average line chart."""
-    daily_frame = pd.DataFrame(
+def _daily_chart(daily_averages: list[DailyAverage]) -> alt.Chart:
+    df = pd.DataFrame(
         {
-            "Date": [item.day for item in daily_averages],
-            "Average mood": [item.average_mood for item in daily_averages],
+            "Date": [d.day for d in daily_averages],
+            "Average mood": [d.average_mood for d in daily_averages],
         }
     )
     return cast(
         alt.Chart,
-        alt.Chart(daily_frame)
-        .mark_line(point=alt.OverlayMarkDef(color=ACCENT_COLOR, filled=True), color=ACCENT_COLOR)
+        alt.Chart(df)
+        .mark_line(
+            point=alt.OverlayMarkDef(color=ACCENT_COLOR, filled=True),
+            color=ACCENT_COLOR,
+        )
         .encode(
             x=alt.X("Date:T", title="Date"),
-            y=alt.Y("Average mood:Q", title="Average mood", scale=alt.Scale(domain=[1, 5])),
+            y=alt.Y(
+                "Average mood:Q", title="Average mood", scale=alt.Scale(domain=[1, 5])
+            ),
             tooltip=["Date", "Average mood"],
         )
         .properties(title="Average Mood by Day", height=320)

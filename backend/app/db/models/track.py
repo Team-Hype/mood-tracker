@@ -1,20 +1,14 @@
-<<<<<<< feat/db-init
 from datetime import datetime
 
 from sqlalchemy import Text, DateTime, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.models.mixins.index import UUIDMixin
-=======
-from app.db.models.mixins.index import UUIDMixin
-
->>>>>>> main
 from .. import DeclarativeBase as Base
 
 
 class MoodTrack(UUIDMixin, Base):
     __tablename__ = "mood_track"
-<<<<<<< feat/db-init
 
     username: Mapped[str] = mapped_column(
         nullable=False, comment="Username of the entry author"
@@ -34,6 +28,3 @@ class MoodTrack(UUIDMixin, Base):
         nullable=False,
         comment="Date and time of the entry creation",
     )
-=======
-    pass
->>>>>>> main

@@ -4,15 +4,19 @@ from threading import Lock
 from typing import Annotated
 
 from fastapi import Depends
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, AsyncEngine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.asyncio import (
+    AsyncSession,
+    create_async_engine,
+    AsyncEngine,
+    async_sessionmaker,
+)
 from app.src.settings import settings
 
 
 class SessionManager:
     _instance = None
     _lock = Lock()
-    session_maker: sessionmaker = None
+    session_maker: async_sessionmaker | None = None  # changed
     engine: AsyncEngine
 
     def __init__(self) -> None:
@@ -25,9 +29,9 @@ class SessionManager:
                 cls._instance.refresh()
             return cls._instance
 
-    def get_session_maker(self) -> sessionmaker:
+    def get_session_maker(self) -> async_sessionmaker:  # changed return type
         if not self.session_maker:
-            self.session_maker = sessionmaker(
+            self.session_maker = async_sessionmaker(  # changed
                 self.engine, class_=AsyncSession, expire_on_commit=False
             )
         return self.session_maker

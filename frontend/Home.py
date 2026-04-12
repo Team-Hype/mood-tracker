@@ -1,20 +1,15 @@
-"""Streamlit home page for submitting moods."""
-
 import streamlit as st
 
-from team_mood_tracker.core.analytics import MOOD_LABELS
-from team_mood_tracker.frontend.common import global_styles, mood_card_markup, submit_mood
-
-MOOD_RANGE = [1, 2, 3, 4, 5]
+from common import MOOD_EMOJIS, global_styles, submit_mood
+from analytics import MOOD_LABELS
 
 
 def main() -> None:
-    """Render the mood input screen."""
     st.set_page_config(page_title="Mood Tracker", page_icon="💗", layout="wide")
     st.markdown(global_styles(), unsafe_allow_html=True)
 
     if "selected_mood" not in st.session_state:
-        st.session_state["selected_mood"] = 3
+        st.session_state["selected_mood"] = "Okay"
 
     st.markdown(
         """
@@ -32,42 +27,47 @@ def main() -> None:
     _render_mood_selector()
 
     with st.form("mood-form", clear_on_submit=True):
-        user = st.text_input("User name", max_chars=50, placeholder="Anna")
+        username = st.text_input("User name", max_chars=50, placeholder="Anna")
         comment = st.text_area(
             "Comment",
-            max_chars=280,
+            max_chars=500,
             placeholder="Share context, blockers, or wins.",
             height=140,
         )
-        submitted = st.form_submit_button("Submit", width="stretch")
+        submitted = st.form_submit_button("Submit")
 
         if submitted:
-            _handle_submit(user=user, comment=comment, mood=int(st.session_state["selected_mood"]))
+            _handle_submit(
+                username=username,
+                comment=comment,
+                mood_entry=st.session_state["selected_mood"],
+            )
 
-    st.caption(
-        f"Selected mood: {st.session_state['selected_mood']} - "
-        f"{MOOD_LABELS[int(st.session_state['selected_mood'])]}"
-    )
+    st.caption(f"Selected mood: {st.session_state['selected_mood']}")
 
 
 def _render_mood_selector() -> None:
-    """Render the five-card mood selection row."""
     st.subheader("How are you feeling?")
-    columns = st.columns(5, gap="medium")
-    for mood, column in zip(MOOD_RANGE, columns, strict=True):
-        with column:
-            st.markdown(
-                mood_card_markup(mood=mood, is_active=st.session_state["selected_mood"] == mood),
-                unsafe_allow_html=True,
-            )
-            if st.button(f"Choose {mood}", key=f"mood-{mood}", width="stretch"):
-                st.session_state["selected_mood"] = mood
+    cols = st.columns(len(MOOD_LABELS), gap="medium")
+
+    for label, col in zip(MOOD_LABELS, cols, strict=True):
+        with col:
+            # Build button label with emoji + label
+            emoji = MOOD_EMOJIS.get(label, "❓")
+            button_label = f"{emoji}\n\n{label}"
+
+            # Use a button styled like the mood card
+            if st.button(
+                button_label,
+                key=f"mood_btn_{label}",
+                use_container_width=True,
+            ):
+                st.session_state["selected_mood"] = label
                 st.rerun()
 
 
-def _handle_submit(user: str, comment: str, mood: int) -> None:
-    """Validate fields, submit the entry, and show status feedback."""
-    trimmed_user = user.strip()
+def _handle_submit(username: str, comment: str, mood_entry: str) -> None:
+    trimmed_user = username.strip()
     trimmed_comment = comment.strip()
 
     if not trimmed_user:
@@ -78,12 +78,16 @@ def _handle_submit(user: str, comment: str, mood: int) -> None:
         return
 
     try:
-        submit_mood(user=trimmed_user, mood=mood, comment=trimmed_comment)
+        submit_mood(
+            username=trimmed_user,
+            mood_entry=mood_entry,
+            comment=trimmed_comment,
+        )
     except Exception as exc:
         st.error(f"Could not submit the mood entry: {exc}")
         return
 
-    st.success("Mood submitted successfully. Head to Analytics for the latest insights.")
+    st.success("Mood submitted! Head to Analytics for the latest insights.")
 
 
 if __name__ == "__main__":
