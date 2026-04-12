@@ -1,8 +1,11 @@
+# frontend/common.py
+"""Shared frontend helpers for Streamlit pages."""
+
 from __future__ import annotations
 
 import os
 from datetime import datetime
-from typing import Any, cast
+from typing import Any, TypedDict, cast
 
 import requests
 
@@ -17,17 +20,23 @@ SURFACE_COLOR = "#2a2a2a"
 SURFACE_ALT = "#252525"
 TEXT_COLOR = "#FFFFFF"
 MUTED_TEXT = "#F7C6D9"
+MOOD_EMOJIS = {1: "😡", 2: "😔", 3: "😐", 4: "🙂", 5: "😄"}
 
-MOOD_EMOJIS: dict[str, str] = {
-    "Rough": "😡",
-    "Low": "😔",
-    "Okay": "😐",
-    "Good": "🙂",
-    "Great": "😄",
-}
+
+class MoodPayload(TypedDict):
+    """Mood entry payload returned by the API."""
+
+    id: str
+    user: str
+    mood: int
+    mood_emoji: str
+    mood_label: str
+    comment: str | None
+    date: str | datetime
 
 
 def get_api_url() -> str:
+    """Return the configured API base URL."""
     return os.getenv(API_URL_ENV, DEFAULT_API_URL).rstrip("/")
 
 
@@ -35,56 +44,34 @@ def fetch_moods() -> list[MoodPayload]:
     """Load mood entries from the backend."""
     response = requests.get(f"{get_api_url()}/moods", timeout=10.0)
     response.raise_for_status()
-    return cast(list[dict[str, Any]], response.json())
+    moods = cast(list[dict[str, Any]], response.json())
+    for item in moods:
+        item["date"] = datetime.fromisoformat(str(item["date"]))
+    return cast(list[MoodPayload], moods)
 
 
 def submit_mood(user: str, mood: int, comment: str) -> None:
     """Submit a new mood entry to the backend."""
     response = requests.post(
         f"{get_api_url()}/moods",
-        json={"username": username, "mood_entry": mood_entry, "comment": comment},
+        json={"user": user, "mood": mood, "comment": comment},
         timeout=10.0,
     )
     response.raise_for_status()
 
 
-def to_domain_entries(raw: list[dict[str, Any]]) -> list[MoodEntry]:
+def to_domain_entries(raw_entries: list[MoodPayload]) -> list[MoodEntry]:
+    """Convert API payloads into shared domain entries."""
     return [
         MoodEntry(
             id=str(item["id"]),
-            username=str(item["username"]),
-            mood_entry=str(item["mood_entry"]),
-            mood_emoji=str(item["mood_emoji"]),
-            comment=item.get("comment"),
-            created_at=_coerce_datetime(item["created_at"]),
+            user=str(item["user"]),
+            mood=int(item["mood"]),
+            comment=str(item.get("comment") or ""),
+            date=_coerce_datetime(item["date"]),
         )
-        for item in raw
+        for item in raw_entries
     ]
-
-
-def _coerce_datetime(value: str | datetime) -> datetime:
-    if isinstance(value, datetime):
-        return value
-    return datetime.fromisoformat(value)
-
-
-def format_score(score: float) -> str:
-    return f"{score:.2f}/5"
-
-
-def low_mood_class(mood_entry: str) -> str:
-    return " low-mood" if MOOD_SCORE.get(mood_entry, 3) <= 2 else ""
-
-
-def mood_card_markup(mood_label: str, is_active: bool) -> str:
-    emoji = MOOD_EMOJIS.get(mood_label, "❓")
-    active_class = " active" if is_active else ""
-    return f"""
-    <div class="mood-card{active_class}">
-        <div class="mood-emoji">{emoji}</div>
-        <div class="mood-label">{mood_label}</div>
-    </div>
-    """
 
 
 def global_styles() -> str:
@@ -146,19 +133,15 @@ def global_styles() -> str:
     }}
     .stButton > button {{
         width: 100%;
-        min-height: 120px;
         border-radius: 16px;
-        background: {SURFACE_COLOR};
-        border: 1px solid rgba(240, 140, 178, 0.14);
+        border: 1px solid rgba(240, 140, 178, 0.25);
+        background: transparent;
         color: {TEXT_COLOR};
+        min-height: 130px;
+        white-space: pre-line;
         font-size: 1rem;
-        font-weight: 600;
-        transition: all 0.2s ease;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 0.25rem;
+        line-height: 1.5;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
     }}
     .stButton > button:hover {{
         border-color: {ACCENT_COLOR};
@@ -183,3 +166,32 @@ def global_styles() -> str:
     }}
     </style>
     """
+
+
+def mood_card_markup(mood: int, is_active: bool) -> str:
+    """Render card markup for a single mood selector item."""
+    active_class = " active" if is_active else ""
+    return f"""
+    <div class="mood-card{active_class}">
+        <div class="mood-emoji">{MOOD_EMOJIS[mood]}</div>
+        <div class="mood-number">Mood {mood}</div>
+        <div class="mood-label">{MOOD_LABELS[mood]}</div>
+    </div>
+    """
+
+
+def format_score(score: float) -> str:
+    """Format a mood score for display."""
+    return f"{score:.2f}/5"
+
+
+def low_mood_class(last_mood: int) -> str:
+    """Return a CSS class for low-mood user cards."""
+    return " low-mood" if last_mood <= LOW_MOOD_THRESHOLD else ""
+
+
+def _coerce_datetime(value: str | datetime) -> datetime:
+    """Convert a payload date value into a datetime."""
+    if isinstance(value, datetime):
+        return value
+    return datetime.fromisoformat(value)

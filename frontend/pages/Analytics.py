@@ -7,6 +7,7 @@ import pandas as pd
 import streamlit as st
 
 from frontend.analytics import (
+    MOOD_LABELS,
     build_daily_averages,
     build_distribution,
     build_insights,
@@ -140,7 +141,7 @@ def _distribution_chart(distribution: list[MoodDistribution]) -> alt.Chart:
 
 
 def _daily_chart(daily_averages: list[DailyAverage]) -> alt.Chart:
-    df = pd.DataFrame(
+    daily_frame = pd.DataFrame(
         {
             "Date": [d.day for d in daily_averages],
             "Average mood": [d.average_mood for d in daily_averages],

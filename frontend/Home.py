@@ -1,7 +1,6 @@
 import streamlit as st
 
 from frontend.common import global_styles, mood_card_markup, submit_mood
-from frontend.analytics import MOOD_LABELS
 
 MOOD_RANGE = [1, 2, 3, 4, 5]
 
@@ -40,7 +39,9 @@ def main() -> None:
 
         if submitted:
             _handle_submit(
-                user=user, comment=comment, mood=int(st.session_state["selected_mood"])
+                user=username,
+                comment=comment,
+                mood=int(st.session_state["selected_mood"]),
             )
 
     st.caption(f"Selected mood: {st.session_state['selected_mood']}")

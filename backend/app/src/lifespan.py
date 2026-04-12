@@ -15,7 +15,20 @@ logger = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Manage application lifespan: setup before yield, teardown after."""
+    """Manage application lifespan: verify DB connection on startup, dispose on shutdown."""
+    sm = SessionManager()
+    session_maker = sm.get_session_maker()
+
+    # Verify the database is reachable
+    try:
+        async with session_maker() as session:
+            await session.execute(text("SELECT 1"))
+        logger.info("Database connection verified.")
+    except Exception as exc:
+        logger.error("Database connection failed: %s", exc)
+
     yield
 
+    # Cleanup
     await sm.engine.dispose()
+    logger.info("Database engine disposed.")

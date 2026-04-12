@@ -1,15 +1,14 @@
-from uuid import uuid4, UUID
+from uuid import UUID
 
-import sqlalchemy as sa
-from sqlalchemy import select
+from sqlalchemy import Uuid, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import Mapped
+from sqlalchemy.orm import Mapped, mapped_column
 
 
 class UUIDMixin:
     __abstract__ = True
-    id: Mapped[UUID] = sa.Column(
-        sa.UUID, nullable=False, primary_key=True, default=uuid4
+    id: Mapped[Uuid] = mapped_column(
+        Uuid, primary_key=True, server_default=func.gen_random_uuid()
     )
 
     @classmethod
