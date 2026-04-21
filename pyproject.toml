@@ -18,7 +18,7 @@ dependencies = [
     "psycopg2-binary (>=2.9.11,<3.0.0)",
     "streamlit (>=1.56.0,<2.0.0)",
     "pandas (>=3.0.2,<4.0.0)",
-    "altair (>=6.0.0,<7.0.0)",
+    "altair (>=6.1.0,<7.0.0)",
     "greenlet (>=3.4.0,<4.0.0)"
 ]
 
